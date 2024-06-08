@@ -8,5 +8,5 @@ import (
 
 func main() {
 	http.HandleFunc("/start", adapters.SocketHandler)
-	log.Fatal(http.ListenAndServe("localhost:8080", nil))
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
