@@ -1,7 +1,6 @@
 # build stage
-FROM golang:1.21.1 as build
+FROM golang:1.21.1-alpine as build
 
-ARG CI_JOB_TOKEN
 RUN apk add alpine-sdk
 
 RUN mkdir /app
