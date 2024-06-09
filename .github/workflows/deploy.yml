@@ -33,12 +33,12 @@ jobs:
           echo "SERVER_PORT=${{ vars.SERVER_PORT }}" >> .env
       - name: Save .env file
         run:
-          scp -o StrictHostKeyChecking=no .env root@${{ secrets.VPS_HOST }}:/root/chat-backend
+          scp -o StrictHostKeyChecking=no .env root@${{ secrets.VPS_HOST }}:/root/chat-backend/
       - name: Load Docker image on VPS and run
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} << 'EOF'
             docker load -i /root/chat-backend/chat-backend.tar
             docker stop chat-backend || true
             docker rm chat-backend || true
-            docker run -d --name chat-backend --env-file root/chat-backend/.env -p 80:${{ vars.SERVER_PORT }} chat-backend:latest
+            docker run -d --name chat-backend --env-file /root/chat-backend/.env -p 80:${{ vars.SERVER_PORT }} chat-backend:latest
           EOF
