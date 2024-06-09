@@ -33,5 +33,5 @@ jobs:
             docker load -i /root/chat-backend.tar
             docker stop chat-backend || true
             docker rm chat-backend || true
-            docker run -d --name chat-backend -p 80:80 chat-backend:latest
+            docker run -d --name chat-backend -p 80:8080 chat-backend:latest
           EOF

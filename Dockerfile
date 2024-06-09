@@ -18,5 +18,5 @@ RUN GOOS=linux GOARCH=amd64 go build -a -tags musl -a -installsuffix cgo -o main
 FROM alpine:latest
 COPY --from=build /app/main /
 
-EXPOSE 80
+EXPOSE 8080
 ENTRYPOINT ["/main"]
