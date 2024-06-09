@@ -13,7 +13,7 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+          ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
       - name: Build Docker image
         run: docker build -t chat-backend:latest .
       - name: Save Docker image to tar
@@ -23,15 +23,20 @@ jobs:
         with:
           source: "chat-backend.tar"
           target: "/root"
-          host:  ${{ secrets.SERVER_IP }}
+          host:  ${{ secrets.VPS_HOST }}
           username: root
-          key:  ${{ secrets.DEPLOY_KEY }}
+          key:  ${{ secrets.VPS_PRIVATE_KEY }}
+
+      - name: Create .env file
+        run: |
+          echo "SERVER_HOST=${{ env.SERVER_HOST }}" >> .env
+          echo "SERVER_PORT=${{ env.SERVER_PORT }}" >> .env
 
       - name: Load Docker image on VPS and run
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} << 'EOF'
             docker load -i /root/chat-backend.tar
             docker stop chat-backend || true
             docker rm chat-backend || true
-            docker run -d --name chat-backend -p 80:8080 chat-backend:latest
+            docker run -d --name chat-backend --env-file .env -p 80:{{ secrets.SERVER_PORT }} chat-backend:latest
           EOF

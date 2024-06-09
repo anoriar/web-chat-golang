@@ -1,12 +1,13 @@
 package main
 
 import (
-	"chat/internal/server/adapters"
+	"chat/internal/adapters"
+	"chat/internal/infrastructure/env"
 	"log"
 	"net/http"
 )
 
 func main() {
 	http.HandleFunc("/start", adapters.SocketHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(env.Endpoint, nil))
 }
