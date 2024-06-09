@@ -1,0 +1,37 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+      - name: Build Docker image
+        run: docker build -t chat-backend:latest .
+      - name: Save Docker image to tar
+        run: docker save chat-backend:latest -o chat-backend.tar
+      - name: Copy Docker image to VPS
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          source: "chat-backend.tar"
+          target: "/root/chat-backend.tar"
+          host:  ${{ secrets.SERVER_IP }}
+          username: root
+          key:  ${{ secrets.DEPLOY_KEY }}
+
+      - name: Load Docker image on VPS and run
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_IP }} << 'EOF'
+            docker load -i /root/chat-backend.tar
+            docker stop chat-backend || true
+            docker rm chat-backend || true
+            docker run -d --name chat-backend -p 80:80 chat-backend:latest
+          EOF
