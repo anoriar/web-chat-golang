@@ -38,5 +38,5 @@ jobs:
             docker load -i /root/chat-backend.tar
             docker stop chat-backend || true
             docker rm chat-backend || true
-            docker run -d --name chat-backend --env-file .env -p 80:{{ env.SERVER_PORT }} chat-backend:latest
+            docker run -d --name chat-backend --env-file .env -p 80:${{ env.SERVER_PORT }} chat-backend:latest
           EOF
